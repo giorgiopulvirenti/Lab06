@@ -39,14 +39,103 @@ public class MeteoDAO {
 		}
 	}
 
+	public List<Rilevamento> getAllRilevamentiLocalita(String localita){
+		final String sql = "SELECT Localita, Data, Umidita FROM situazione WHERE Localita=? ORDER BY data ASC";
+
+		List<Rilevamento> rilevamenti = new ArrayList<Rilevamento>();
+
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, localita);
+		
+
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+
+				Rilevamento r = new Rilevamento(rs.getString("Localita"), rs.getDate("Data"), rs.getInt("Umidita"));
+				rilevamenti.add(r);
+			}
+
+			conn.close();
+			return rilevamenti;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	
+		
+	}
 	public List<Rilevamento> getAllRilevamentiLocalitaMese(int mese, String localita) {
 
-		return null;
+
+		final String sql = "SELECT Localita, Data, Umidita FROM situazione WHERE Localita=? && month(Data)=? ORDER BY data ASC";
+
+		List<Rilevamento> rilevamenti = new ArrayList<Rilevamento>();
+
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, localita);
+			st.setInt(2, mese);
+			
+
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+
+				Rilevamento r = new Rilevamento(rs.getString("Localita"), rs.getDate("Data"), rs.getInt("Umidita"));
+				rilevamenti.add(r);
+			}
+
+			conn.close();
+			return rilevamenti;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
+	public int getRilevamentoLocalitaMeseGiorno(int mese,int giorno, String localita) {
+
+int i=0;
+		final String sql = "SELECT Umidita FROM situazione WHERE Localita=? && month(Data)=? && day(Data)=?";
+
+	
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, localita);
+			st.setInt(2, mese);
+			st.setInt(3, giorno);
+			
+
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+
+				i= rs.getInt("Umidita");
+				
+			}
+
+			conn.close();
+			return i;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
 	public Double getAvgRilevamentiLocalitaMese(int mese, String localita) {
 
 		return 0.0;
 	}
+	
 
 }

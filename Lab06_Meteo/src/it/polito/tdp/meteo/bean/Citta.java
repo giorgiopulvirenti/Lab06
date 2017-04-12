@@ -7,7 +7,18 @@ public class Citta {
 	private String nome;
 	private List<Rilevamento> rilevamenti;
 	private int counter = 0;
+	private int umiditaMedia;
+	private int counter1 = 0;
 	
+	
+	public int getCounter1() {
+		return counter1;
+	}
+
+	public void setCounter1(int counter1) {
+		this.counter1 = counter1;
+	}
+
 	public Citta(String nome) {
 		this.nome = nome;
 	}
@@ -45,6 +56,9 @@ public class Citta {
 		this.counter += 1;
 	}
 
+	public void increaseCounter1() {
+		this.counter1 += 1;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -73,6 +87,10 @@ public class Citta {
 	@Override
 	public String toString() {
 		return nome;
+	}
+	public void addRilevamento(){
+
+		
 	}
 	
 }
