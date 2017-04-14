@@ -27,6 +27,10 @@ public class SimpleCity {
 		this.counter += 1;
 	}
 	
+	public void decreaseCounter() {
+		this.counter -= 1;
+	}
+	
 	public String getNome() {
 		return nome;
 	}

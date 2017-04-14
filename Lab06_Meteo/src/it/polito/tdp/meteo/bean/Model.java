@@ -1,36 +1,36 @@
-package it.polito.tdp.meteo;
+package it.polito.tdp.meteo.bean;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import it.polito.tdp.meteo.bean.Citta;
-import it.polito.tdp.meteo.bean.Rilevamento;
-import it.polito.tdp.meteo.bean.SimpleCity;
 import it.polito.tdp.meteo.db.MeteoDAO;
 
 public class Model {
 
 	MeteoDAO dao=new MeteoDAO();
 	List <Rilevamento> rilevamenti;
+	List <Rilevamento> rilevamentii;
 	Map <String,Citta> citta=new TreeMap<String,Citta>();
 	List<Citta> cittaa;
 	private final static int COST = 50;
 	private final static int NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN = 3;
 	private final static int NUMERO_GIORNI_CITTA_MAX = 6;
 	private final static int NUMERO_GIORNI_TOTALI = 15;
-	private double costoMinimo=99999999;
+	private double costoMinimo=999999;
 	List <SimpleCity> soluzione;
 
 	public Model() {
 // rilevamenti=dao.getAllRilevamenti();
+		rilevamentii=dao.getAllRilevamenti();
+		this.setCitta();
 		
 
 	}
  
 	public void setCitta(){
-		for (Rilevamento r:rilevamenti){
+		for (Rilevamento r:rilevamentii){
 			if (!citta.containsKey(r.getLocalita()))
 				citta.put(r.getLocalita(), new Citta(r.getLocalita(),dao.getAllRilevamentiLocalita(r.getLocalita())));
 			
@@ -47,7 +47,7 @@ String s="";
 	public String trovaSequenza(int mese) {
 		String f="";
 		int level=0;
-		cittaa=(List<Citta>) citta.values();
+		cittaa=new ArrayList<Citta>( citta.values());
 		 soluzione=new ArrayList<SimpleCity>();
 
 		this.recursive(soluzione, level,mese);
@@ -59,15 +59,20 @@ String s="";
 
 	public void recursive (List<SimpleCity> parziale, int level,int mese) {
 	
-		 if (parziale.size()>=this.NUMERO_GIORNI_TOTALI) {
+		if (level>=this.NUMERO_GIORNI_TOTALI) {
 			 if (this.controllaParziale(parziale,mese)==true){
+		//		System.out.println(this.punteggioSoluzione(parziale));
 			 if(this.punteggioSoluzione(parziale)<=this.costoMinimo){
-				 for(Citta c:cittaa)
-					 c.setCounter(0);
+				
+		//		 for(Citta c:cittaa){
+		//			 c.setCounter(0);
+	//			 }
 				 costoMinimo=this.punteggioSoluzione(parziale);
-				soluzione=parziale;
+			 System.out.println(parziale+"   kkkkkkkkk");
+				soluzione=new ArrayList<SimpleCity>(parziale);
 			 }
 			 }
+			 this.cancellaCostoParziale(parziale);
 		 return;
 		 }
 	
@@ -77,13 +82,25 @@ String s="";
 			 parziale.add(new SimpleCity(cittaa.get(i).getNome()));
 			
 			 cittaa.get(i).increaseCounter();
-			 }
-			 }
+			 
+			 
 			 recursive (parziale, level + 1,mese);
+	//		 System.out.println(level);
+	//		 System.out.println(cittaa.get(i)+" "+cittaa.get(i).getCounter()+" @@@@");
 			 parziale.remove(parziale.size()-1);
+			 cittaa.get(i).decreaseCounter();
+			 }
 		 }
+	}
 		
 		
+	private void cancellaCostoParziale(List<SimpleCity> parziale) {
+		for(SimpleCity s:parziale)
+			s.setCosto(0);
+			
+		
+	}
+
 	private Double punteggioSoluzione(List<SimpleCity> soluzioneCandidata) {
 
 		
@@ -99,23 +116,28 @@ for (Citta c:cittaa)
 		return false;
 
 String a="";
-int d=0;
+int []d=new int[15];
+int f=0;
 for(int i =0;i<parziale.size();i++){
-	parziale.get(i).increaseCosto(dao.getRilevamentoLocalitaMeseGiorno(mese, i, parziale.get(i).getNome()));
+		parziale.get(i).increaseCosto(dao.getRilevamentoLocalitaMeseGiorno(mese, i, parziale.get(i).getNome()));
 	if (a=="" || a.equals(parziale.get(i).getNome())){
-		d++;
-		a=parziale.get(i).getNome();
+		d[f]++;
+		
 	}
 	else
 	{
-		if (d<3){
-			d=0;
-			return false;
-			}
-	d=0;
+		f++;
+	
 	parziale.get(i).increaseCosto(100);
 	}
+	a=parziale.get(i).getNome();
 }
+for (int i=0;i<=f;i++)
+	if (d[i]<2){
+//		System.out.println(parziale+" "+i+" "+f+" "+d[i]);
+		return false;
+	}
+
 		return true;
 	}
 	

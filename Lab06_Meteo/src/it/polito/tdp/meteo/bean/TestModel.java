@@ -1,4 +1,4 @@
-package it.polito.tdp.meteo;
+package it.polito.tdp.meteo.bean;
 
 public class TestModel {
 
@@ -8,7 +8,7 @@ public class TestModel {
 		
 		System.out.println(m.getUmiditaMedia(12));
 		
-	//	System.out.println(m.trovaSequenza(5));
+		System.out.println("ciao  "+m.trovaSequenza(5));
 		
 //		System.out.println(m.trovaSequenza(4));
 	}
