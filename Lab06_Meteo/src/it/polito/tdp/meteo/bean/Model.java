@@ -22,7 +22,7 @@ public class Model {
 	List <SimpleCity> soluzione;
 
 	public Model() {
-// rilevamenti=dao.getAllRilevamenti();
+
 		rilevamentii=dao.getAllRilevamenti();
 		this.setCitta();
 		
@@ -54,25 +54,22 @@ String s="";
 		 
 		for(SimpleCity s: soluzione)
 			f+=s.getNome()+"; ";
-		return f;
+		return f+" "+this.punteggioSoluzione(soluzione, mese);
 	}
 
 	public void recursive (List<SimpleCity> parziale, int level,int mese) {
 	
 		if (level>=this.NUMERO_GIORNI_TOTALI) {
 			 if (this.controllaParziale(parziale,mese)==true){
-		//		System.out.println(this.punteggioSoluzione(parziale));
-			 if(this.punteggioSoluzione(parziale)<=this.costoMinimo){
-				
-		//		 for(Citta c:cittaa){
-		//			 c.setCounter(0);
-	//			 }
-				 costoMinimo=this.punteggioSoluzione(parziale);
-			 System.out.println(parziale+"   kkkkkkkkk");
+		
+			 if(this.punteggioSoluzione(parziale,mese)<=this.costoMinimo){
+	
+				 costoMinimo=this.punteggioSoluzione(parziale,mese);
+//			 System.out.println(parziale+"  "+costoMinimo);
 				soluzione=new ArrayList<SimpleCity>(parziale);
 			 }
 			 }
-			 this.cancellaCostoParziale(parziale);
+		
 		 return;
 		 }
 	
@@ -85,8 +82,7 @@ String s="";
 			 
 			 
 			 recursive (parziale, level + 1,mese);
-	//		 System.out.println(level);
-	//		 System.out.println(cittaa.get(i)+" "+cittaa.get(i).getCounter()+" @@@@");
+
 			 parziale.remove(parziale.size()-1);
 			 cittaa.get(i).decreaseCounter();
 			 }
@@ -101,13 +97,20 @@ String s="";
 		
 	}
 
-	private Double punteggioSoluzione(List<SimpleCity> soluzioneCandidata) {
-
+	private Double punteggioSoluzione(List<SimpleCity> soluzioneCandidata,int mese) {
+		double costo=0;
+		String sol="";
 		
-		double score = 0.0;
-		for (SimpleCity s: soluzioneCandidata)
-			score+=s.getCosto();
-		return score;
+		for (int i=0;i<soluzioneCandidata.size();i++){
+			costo+=dao.getRilevamentoLocalitaMeseGiorno(mese, i, soluzioneCandidata.get(i).getNome());
+		if(i!=0&&!sol.equals(soluzioneCandidata.get(i).getNome()))
+	costo+=100;
+		sol=soluzioneCandidata.get(i).getNome();
+		}
+		
+		
+		
+		return costo;
 	}
 
 	private boolean controllaParziale(List<SimpleCity> parziale,int mese) {
@@ -119,7 +122,7 @@ String a="";
 int []d=new int[15];
 int f=0;
 for(int i =0;i<parziale.size();i++){
-		parziale.get(i).increaseCosto(dao.getRilevamentoLocalitaMeseGiorno(mese, i, parziale.get(i).getNome()));
+		
 	if (a=="" || a.equals(parziale.get(i).getNome())){
 		d[f]++;
 		
@@ -128,13 +131,12 @@ for(int i =0;i<parziale.size();i++){
 	{
 		f++;
 	
-	parziale.get(i).increaseCosto(100);
 	}
 	a=parziale.get(i).getNome();
 }
 for (int i=0;i<=f;i++)
 	if (d[i]<2){
-//		System.out.println(parziale+" "+i+" "+f+" "+d[i]);
+
 		return false;
 	}
 
